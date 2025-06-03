@@ -44,7 +44,8 @@ def load_model_nn() -> OrdinalNN:
         print("Model is not trained yet! Please run train.ipynb first.")
     model = OrdinalNN(17, 7)
     # whitelist OrdinalNN to allow loading the full model object safely
-    model.load_state_dict(torch.load(model_path))
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
     return model
 
