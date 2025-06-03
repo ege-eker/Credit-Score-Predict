@@ -10,6 +10,7 @@ from xgboost import XGBClassifier
 from pydantic import BaseModel
 import numpy as np
 import pandas as pd
+from lightgbm import LGBMModel
 
 
 
@@ -30,6 +31,12 @@ def load_model_svm() -> SVC:
     if not os.path.exists(model_path):
         print("Model is not trained yet! Please run train.ipynb first.")
     return cast(SVC, joblib.load(model_path))
+
+def load_model_lgb() -> LGBMModel:
+    model_path = "models/lgb-model.pkl"
+    if not os.path.exists(model_path):
+        print("Model is not trained yet! Please run train.ipynb first.")
+    return cast(LGBMModel, joblib.load(model_path))
 
 def load_model_nn() -> OrdinalNN:
     model_path = "models/nn-model.pth"
@@ -144,6 +151,7 @@ class MasterPredictor:
         self.gb_model = load_model_gb()
         self.rf_model = load_model_rf()
         self.svm_model = load_model_svm()
+        self.lgb_model = load_model_lgb()
         self.nn_model = load_model_nn()
         self.xgb_model = load_model_xgb()
         self.scaler = load_scaler()
@@ -151,39 +159,38 @@ class MasterPredictor:
     prediction_result = Literal["A", "B", "C", "D", "E", "F", "G"]
 
     def predict_gb(self, params: CreditDetailsParams) -> prediction_result:
-        model = load_model_gb()
         x = params.to_dataframe(self.scaler)
-        result = model.predict(x)[0]
+        result = self.gb_model.predict(x)[0]
         return self.map_raw_to_letter(result)
 
     def predict_rf(self, params: CreditDetailsParams) -> prediction_result:
-        model = load_model_rf()
         x = params.to_dataframe(self.scaler)
-        result = model.predict(x)[0]
+        result = self.rf_model.predict(x)[0]
         return self.map_raw_to_letter(result)
 
     def predict_svm(self, params: CreditDetailsParams) -> prediction_result:
-        model = load_model_svm()
         x = params.to_dataframe(self.scaler)
-        result = model.predict(x)[0]
+        result = self.svm_model.predict(x)[0]
+        return self.map_raw_to_letter(result)
+
+    def predict_lgb(self, params: CreditDetailsParams) -> prediction_result:
+        x = params.to_dataframe(self.scaler)
+        result = self.lgb_model.predict(x)[0]
         return self.map_raw_to_letter(result)
 
     def predict_nn(self, params: CreditDetailsParams) -> prediction_result:
         x = params.to_tensor(self.scaler)
 
-        nn_model = load_model_nn()
-
         with torch.no_grad():
-            _, predictions = nn_model(x)
+            _, predictions = self.nn_model(x)
             nn_ordinal_pred = predictions.cpu().numpy()
 
         result = nn_ordinal_pred[0]
         return self.map_raw_to_letter(result)
 
     def predict_xgb(self, params: CreditDetailsParams) -> prediction_result:
-        model = load_model_xgb()
         x = params.to_dataframe(self.scaler)
-        result = model.predict(x)[0]
+        result = self.xgb_model.predict(x)[0]
         return self.map_raw_to_letter(result)
 
     @staticmethod
