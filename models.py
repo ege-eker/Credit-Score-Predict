@@ -1,7 +1,7 @@
 from typing import cast, Literal
 import joblib
 import os
-from sklearn.ensemble import  GradientBoostingClassifier, RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 import torch
@@ -13,12 +13,12 @@ import pandas as pd
 from lightgbm import LGBMModel
 
 
-
 def load_model_gb() -> GradientBoostingClassifier:
     model_path = "models/gb-model.pkl"
     if not os.path.exists(model_path):
         print("Model is not trained yet! Please run train.ipynb first.")
     return cast(GradientBoostingClassifier, joblib.load(model_path))
+
 
 def load_model_rf() -> RandomForestClassifier:
     model_path = "models/rf-model.pkl"
@@ -26,17 +26,20 @@ def load_model_rf() -> RandomForestClassifier:
         print("Model is not trained yet! Please run train.ipynb first.")
     return cast(RandomForestClassifier, joblib.load(model_path))
 
+
 def load_model_svm() -> SVC:
     model_path = "models/svm-model.pkl"
     if not os.path.exists(model_path):
         print("Model is not trained yet! Please run train.ipynb first.")
     return cast(SVC, joblib.load(model_path))
 
+
 def load_model_lgb() -> LGBMModel:
     model_path = "models/lgb-model.pkl"
     if not os.path.exists(model_path):
         print("Model is not trained yet! Please run train.ipynb first.")
     return cast(LGBMModel, joblib.load(model_path))
+
 
 def load_model_nn() -> OrdinalNN:
     model_path = "models/nn-model.pth"
@@ -49,6 +52,7 @@ def load_model_nn() -> OrdinalNN:
     model.eval()
     return model
 
+
 def load_model_xgb() -> XGBClassifier:
     model_path = "models/xgb-model.ubj"
     if not os.path.exists(model_path):
@@ -56,6 +60,7 @@ def load_model_xgb() -> XGBClassifier:
     xgb_model = XGBClassifier()
     xgb_model.load_model(model_path)
     return xgb_model
+
 
 def load_scaler() -> StandardScaler:
     if not os.path.exists("models/scaler.pkl"):
@@ -147,6 +152,7 @@ class CreditDetailsParams(BaseModel):
         x = self.to_dataframe(scaler)
         return torch.tensor(x.values, dtype=torch.float32)
 
+
 class MasterPredictor:
     def __init__(self):
         self.gb_model = load_model_gb()
@@ -196,10 +202,17 @@ class MasterPredictor:
 
     @staticmethod
     def map_raw_to_letter(raw: int) -> prediction_result:
-        if raw == 6: return "A"
-        elif raw == 5: return "B"
-        elif raw == 4: return "C"
-        elif raw == 3: return "D"
-        elif raw == 2: return "E"
-        elif raw == 1: return "F"
-        else: return "G"
+        if raw == 6:
+            return "A"
+        elif raw == 5:
+            return "B"
+        elif raw == 4:
+            return "C"
+        elif raw == 3:
+            return "D"
+        elif raw == 2:
+            return "E"
+        elif raw == 1:
+            return "F"
+        else:
+            return "G"

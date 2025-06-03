@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch
 
+
 class OrdinalNN(nn.Module):
     def __init__(self, input_dim, num_classes):
         super().__init__()
