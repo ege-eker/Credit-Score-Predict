@@ -61,7 +61,7 @@ class CreditDetailsParams(BaseModel):
     employment_length: int
     loan_amount: int
     loan_intent: Literal["VENTURE", "PERSONAL", "MEDICAL", "HOMEIMPROVEMENT", "EDUCATION"]
-    home_ownership: Literal["OWN", "RENT"]
+    home_ownership: Literal["OWN", "RENT", "MORTGAGE"]
     default_on_file: bool
 
     def to_dataframe(self, scaler: StandardScaler) -> pd.DataFrame:
@@ -85,6 +85,7 @@ class CreditDetailsParams(BaseModel):
 
             "person_home_ownership_OWN": float(self.home_ownership == "OWN"),
             "person_home_ownership_RENT": float(self.home_ownership == "RENT"),
+            "person_home_ownership_MORTGAGE": float(self.home_ownership == "MORTGAGE"),
 
             "cb_person_default_on_file": float(self.default_on_file),
 
