@@ -1,13 +1,11 @@
 services:
   frontend:
     build: frontend
-    environment:
-      - NEXT_PUBLIC_API_URL=https://api-credit.umceko.com
     ports:
-      - "3000:3000"
+      - "4500:3000"
     restart: unless-stopped
   api:
     build: .
     ports:
-      - "3001:3000"
+      - "4501:3000"
     restart: unless-stopped

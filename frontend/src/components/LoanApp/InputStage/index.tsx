@@ -79,7 +79,7 @@ export default function InputStage({
 	return (
 		<div className={"bg-gray-100 rounded-md h-max p-8 flex flex-col justify-between items-center gap-10 text-black"}>
 			<div>
-				<p className={"text-4xl"}>Loan Application</p>
+				<p className={"text-4xl"}>Credit Score Predictor</p>
 			</div>
 			<div className={"grid gap-x-6 gap-y-4 grid-cols-2 "}>
 				<TextInput type={"numeric"} label={"Income (Yearly)"} state={income} setState={setIncome}/>
