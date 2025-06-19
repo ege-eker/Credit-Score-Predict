@@ -25,7 +25,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-@app.post("/predict")
+@app.post("/api/predict")
 def predict(body: PredictionRequest):
     if body.model == "gb":
         return PredictionResponse(result=predictor.predict_gb(body.params))

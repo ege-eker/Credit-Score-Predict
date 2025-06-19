@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: credit-score
+  labels:
+    app: credit-score
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: credit-score
+  template:
+    metadata:
+      name: credit-score
+      labels:
+        app: credit-score
+    spec:
+      containers:
+        - name: credit-score
+          image: hub.umceko.com/credit/backend:0.1.2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+      restartPolicy: Always
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: credit-score-frontend
+  labels:
+    app: credit-score-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: credit-score-frontend
+  template:
+    metadata:
+      name: credit-score-frontend
+      labels:
+        app: credit-score-frontend
+    spec:
+      containers:
+        - name: credit-score-frontend
+          image: hub.umceko.com/credit/frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+      restartPolicy: Always
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: credit-score-service
+spec:
+  selector:
+    app: credit-score
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: credit-score-frontend-service
+spec:
+  selector:
+    app: credit-score-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: NodePort
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: credit-score-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: credit.umceko.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: credit-score-service
+                port:
+                  number: 80
+    - host: credit.umceko.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: credit-score-frontend-service
+                port:
+                  number: 80

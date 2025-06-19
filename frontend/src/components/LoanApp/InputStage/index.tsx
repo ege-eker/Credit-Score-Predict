@@ -94,7 +94,7 @@ export default function InputStage({
 			<div className={"w-full"}>
 				<Button onClick={async ()=> {
 					setStage("processing")
-					let response = await fetch(`https://api-credit.umceko.com/predict`, {
+					let response = await fetch(`https://credit.umceko.com/api/predict`, {
 						body: JSON.stringify(data),
 						method: "POST",
 						headers: {
