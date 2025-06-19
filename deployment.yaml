@@ -1,23 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: credit-score
+  name: credit-score-backend-deployment
   labels:
-    app: credit-score
+    app: credit-score-backend-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: credit-score
+      app: credit-score-backend-deployment
   template:
     metadata:
-      name: credit-score
       labels:
-        app: credit-score
+        app: credit-score-backend-deployment
     spec:
       containers:
-        - name: credit-score
-          image: hub.umceko.com/credit/backend:0.1.2
+        - name: credit-score-backend
+          image: hub.umceko.com/credit/backend:0.1.3
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
@@ -29,44 +28,42 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: credit-score-frontend
+  name: credit-score-frontend-deployment
   labels:
-    app: credit-score-frontend
+    app: credit-score-frontend-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: credit-score-frontend
+      app: credit-score-frontend-deployment
   template:
     metadata:
-      name: credit-score-frontend
       labels:
-        app: credit-score-frontend
+        app: credit-score-frontend-deployment
     spec:
       containers:
         - name: credit-score-frontend
-          image: hub.umceko.com/credit/frontend:latest
+          image: hub.umceko.com/credit/frontend:0.1.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
               protocol: TCP
       restartPolicy: Always
 
-
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: credit-score-service
+  name: credit-score-backend-service
 spec:
   selector:
-    app: credit-score
+    app: credit-score-backend-deployment
   ports:
     - protocol: TCP
       port: 80
       targetPort: 3000
-  type: NodePort
+  type: ClusterIP
 
 ---
 
@@ -76,12 +73,12 @@ metadata:
   name: credit-score-frontend-service
 spec:
   selector:
-    app: credit-score-frontend
+    app: credit-score-frontend-deployment
   ports:
     - protocol: TCP
       port: 80
       targetPort: 3000
-  type: NodePort
+  type: ClusterIP
 
 ---
 
@@ -89,26 +86,27 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: credit-score-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
     - host: credit.umceko.com
       http:
         paths:
-          - path: /api
-            pathType: Prefix
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
-                name: credit-score-service
+                name: credit-score-backend-service
                 port:
                   number: 80
-    - host: credit.umceko.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
+          - path: /()(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: credit-score-frontend-service
                 port:
                   number: 80
+
+
