@@ -26,7 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 @app.post("/predict")
-def predict(body: PredictionRequest):
+def predict(body: PredictionRequest) -> PredictionResponse:
     if body.model == "gb":
         return PredictionResponse(result=predictor.predict_gb(body.params))
     elif body.model == "lgb":

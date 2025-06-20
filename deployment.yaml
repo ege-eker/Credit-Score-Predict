@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: credit-score-backend
-          image: hub.umceko.com/credit/backend:0.1.3
+          image: hub.umceko.com/credit/backend:0.1.4
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
@@ -95,6 +95,13 @@ spec:
       http:
         paths:
           - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: credit-score-backend-service
+                port:
+                  number: 80
+          - path: /()(openapi.json)
             pathType: ImplementationSpecific
             backend:
               service:
